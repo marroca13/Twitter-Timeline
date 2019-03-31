@@ -1,4 +1,4 @@
-# Refresh image
+# Refresh twitter image
 
 This project aims to help you to set up a simple HTML page that forces the browser to reload an image using URL parameters.
 
