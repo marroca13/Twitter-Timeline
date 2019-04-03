@@ -1,0 +1,84 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Twitter widget</title>
+	<style>
+		body.collapsed{margin:0; padding: 0;}
+		canvas{width:100%;}
+	</style>
+</head>
+<body>
+
+    <script src="utils.js"></script>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script>
+        var a = document.createElement("a"),
+            params = {};
+            user = getParameterByName("user"),
+            list = getParameterByName("list"),
+            user = user? user : "hhkaos",
+            list = list? list : null;
+
+            // https://developer.twitter.com/en/docs/twitter-for-websites/timelines/guides/parameter-reference
+            var paramList = ["show-replies", "chrome", "theme", "width", "height", "tweet-limit", "link-color", "border-color", "aria-police", "dnt"];
+
+            var l = paramList.forEach(function(elem, i){
+                var paramValue = getParameterByName(elem);
+                if(paramValue){
+                    try{
+                        params[elem]= eval(paramValue);
+                    }catch(e){
+                        params[elem] = paramValue;
+                    }
+                }
+            })
+
+            if(getParameterByName("collapsed")){
+            	document.querySelector('body').className="collapsed"
+            }
+
+        window.twttr = (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0],
+            t = window.twttr || {};
+          if (d.getElementById(id)) return t;
+          js = d.createElement(s);
+          js.id = id;
+          js.src = "https://platform.twitter.com/widgets.js";
+          fjs.parentNode.insertBefore(js, fjs);
+
+          t._e = [];
+          t.ready = function(f) {
+            t._e.push(f);
+          };
+
+          return t;
+        }(document, "script", "twitter-wjs"));
+
+        if(user && list){
+            timelineParams = {
+              sourceType: "list",
+              ownerScreenName: user,
+              slug: list
+            }
+        }else{
+            timelineParams = {
+                    sourceType: "profile",
+                    screenName: user
+            }
+        }
+
+        twttr.ready(function (twttr) {
+            twttr.widgets.createTimeline(
+              timelineParams,
+              document.getElementById("container"),
+              params
+            );
+        });
+</script>
+    <div id="container"></div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Avoid Frame Ancestors: 'self'</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<style>
+		body.collapsed{margin:0; padding: 0;}
+		#iframeId{width:100%;height: 100%;border:0}
+	</style>
+</head>
+<body>
+    <iframe id="iframeId"></iframe>
+    <script src="utils.js"></script>
+    <script>
+
+        var link = "https://cors-anywhere.herokuapp.com/https://www.esri.com/en-us/arcgis/products/operations-dashboard/overview";
+
+        var newLink = getParameterByName("url");
+        if(newLink){
+            link = "https://cors-anywhere.herokuapp.com/"+newLink;
+        }
+
+        $.get(link, function (response){
+            var html = response;
+        }).fail(function(e) {
+            console.log( "error=",e );
+        }).done(function(d) {
+            d = replaceAll(d, 'assets\.adobedtm\.com', ':"https://assets.adobedtm.com')
+            d = replaceAll(d, 'js\.maxmind\.com', ':"https://js.maxmind.com')
+
+            d = replacerAllSafe(d);
+
+            bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(d)[1];
+            $("body").html(bodyHtml)
+
+            headHtml = /<head.*?>([\s\S]*)<\/head>/.exec(d)[1];
+            $("head").append(headHtml)
+        });
+
+        function replaceAll(str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
+        }
+        function replacerAllSafe(text){
+            text = replaceAll(text, '=\'/', '=\'https://www.esri.com/')
+            text = replaceAll(text, '="/', '="https://www.esri.com/')
+            text = replaceAll(text, ':\'/', ':\'https://www.esri.com/')
+            text = replaceAll(text, ':"/', ':"https://www.esri.com/')
+            text = replaceAll(text, ': "/', ': "https://www.esri.com/')
+            text = replaceAll(text, 'url\\(/', ': "url(https://www.esri.com/')
+
+            return text;
+        }
+
+    </script>
+</body>
+</html>
